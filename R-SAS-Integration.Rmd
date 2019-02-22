@@ -27,6 +27,8 @@ output:
 
 base.url <- "/"
 fig.path <- "images/"
+# change directory
+setwd("/")
 
 library(knitr)
 library(rmdformats)
