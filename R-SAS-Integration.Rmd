@@ -27,16 +27,11 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r pressure, echo=FALSE, fig.cap="", out.width = '60%'}
-knitr::include_graphics("sasandr.jpg")
-```
 
 ```{r knitr_init, echo=FALSE, results="asis", cache=FALSE, warning = FALSE, message=FALSE}
 library(knitr)
 library(rmdformats)
 
-
-getwd()
 
 ## Global options
 options(max.print = "75")
@@ -53,15 +48,9 @@ opts_knit$set(width = 75)
 
 # Introduction
 
-<center><img src="images/sasandr.jpg" width="60%" height="60%" ></center>
-
-```{r sh, echo=TRUE, eval=TRUE}
-not_null <- function (v) {
-  if (!is.null(v)) return(paste(v, "not null"))
-}
+```{r figure2, echo=FALSE, fig.cap="", out.width = '80%' , out.height= '80%',fig.align ='center' }
+knitr::include_graphics("sasandr.jpg")
 ```
-
-
 
 # Tables
 
