@@ -21,12 +21,6 @@ output:
     df_print: kable
     
 ---
-```{r opts, echo = FALSE}
-knitr::opts_chunk$set(
-  fig.path = "images/"
-)
-```
-
 
 ```{r knitr_init, echo=FALSE, results="asis", cache=FALSE, warning = FALSE, message=FALSE}
 library(knitr)
