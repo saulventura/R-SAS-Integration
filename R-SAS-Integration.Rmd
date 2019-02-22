@@ -19,23 +19,23 @@ output:
     fig_width: 4
     fig_height: 4
     df_print: kable
+    
 ---
 
-<center><img src="images/sasandr.jpg" width="60%" height="60%" ></center>
 
+```{r pressure, echo=FALSE, fig.cap="", out.width = '60%'}
+knitr::include_graphics("sasandr.jpg")
+```
 
 ```{r knitr_init, echo=FALSE, results="asis", cache=FALSE, warning = FALSE, message=FALSE}
-
-base.dir <- "/"
-base.url <- "/"
-fig.path <- "images/"
-
-
-# change directory
-setwd("/")
-
 library(knitr)
 library(rmdformats)
+
+knitr::opts_chunk$set(fig.path = "images/")
+
+
+getwd()
+
 ## Global options
 options(max.print = "75")
 opts_chunk$set(echo = FALSE,
