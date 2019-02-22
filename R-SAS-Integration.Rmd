@@ -24,6 +24,10 @@ output:
 
 
 ```{r knitr_init, echo=FALSE, results="asis", cache=FALSE, warning = FALSE, message=FALSE}
+
+base.url <- "/"
+fig.path <- "images/"
+
 library(knitr)
 library(rmdformats)
 ## Global options
