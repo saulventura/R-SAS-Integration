@@ -100,7 +100,7 @@ library(xtable)
 kable(xtable(head(iris)))
 ```
 
-# Figures
+# Data Exploration
 
 ## Base graphics
 
@@ -110,7 +110,7 @@ A base graphics histogram :
 hist(rnorm(100))
 ```
 
-## ggplot2
+## Missing Values
 
 Same with `ggplot2` :
 
@@ -122,7 +122,7 @@ ggplot(data=d) + geom_histogram(aes(x=x), bins = 30)
 
 
 
-# Tabbed sections
+# Data Preparation
 
 Here we test if tabbed sections work correctly.
 
@@ -132,19 +132,11 @@ classical tabs without fading effect.
 
 ### First tab
 
-Quisquam sunt fugit sed aut quis et rerum mollitia. Qui consectetur eius autem ut assumenda alias. Repudiandae aut deleniti quod saepe nihil ratione alias laborum. Quibusdam aspernatur autem omnis voluptatum. Delectus illo non aut. Perferendis sunt facilis sed quam velit.
-Veniam voluptates ut adipisci vel debitis deserunt rerum exercitationem. Accusamus quod eius occaecati voluptatem. Ut et qui veritatis. Nulla non eum id consectetur autem pariatur. Labore aperiam officiis molestiae sed ut perferendis ea. Aperiam aut ratione autem dolorem.
-Fuga reprehenderit tempora ut ipsam cumque officiis dolorum. Sapiente omnis rerum sint quibusdam et delectus ratione. Molestiae praesentium rerum debitis deleniti voluptates enim.
-Nihil aperiam velit provident accusamus suscipit voluptates. Aut sequi id debitis tempore. Qui atque quas sed illum officia maiores incidunt.
-Similique maxime aliquam corrupti aut provident eaque. Laudantium placeat cupiditate pariatur dolore perspiciatis expedita impedit nobis. Quaerat non temporibus tempora provident eligendi.
+Work in progress...
 
 ### Second tab
 
-Cum eaque dicta architecto culpa eius. Dignissimos officiis error exercitationem. Adipisci odit ad ea iusto fugiat laborum maiores. Dolore sunt et veritatis alias nesciunt maxime cumque. Culpa aut non ea. Culpa ex quia debitis sint eveniet cum.
-Non eos ex aperiam dolor hic. Consectetur delectus placeat rerum consequuntur ducimus sed fugiat non. Aut voluptatem et et. Omnis sunt veniam omnis ullam.
-Dolorem eius perspiciatis et veniam hic reprehenderit ipsam ut. Exercitationem rem eius quo. Nemo quis in voluptatibus ex.
-Aut nihil quo iure quia. Error quam quidem inventore. Aut est est aut atque ipsum aut repellat. Eligendi delectus aut et quia voluptas dolores. Perspiciatis et reiciendis deleniti harum nihil officiis aperiam.
-Laborum necessitatibus beatae modi aut illo. Quaerat esse eum ipsa quisquam totam. Vitae nesciunt excepturi voluptate iusto molestiae qui animi corrupti. Voluptates et illum quia.
+Work in progress...
 
 
 ## Pill tabs {.tabset .tabset-fade .tabset-pills}
@@ -153,16 +145,18 @@ Pill tabs with fading effect.
 
 ### First tab
 
-Quisquam sunt fugit sed aut quis et rerum mollitia. Qui consectetur eius autem ut assumenda alias. Repudiandae aut deleniti quod saepe nihil ratione alias laborum. Quibusdam aspernatur autem omnis voluptatum. Delectus illo non aut. Perferendis sunt facilis sed quam velit.
-Veniam voluptates ut adipisci vel debitis deserunt rerum exercitationem. Accusamus quod eius occaecati voluptatem. Ut et qui veritatis. Nulla non eum id consectetur autem pariatur. Labore aperiam officiis molestiae sed ut perferendis ea. Aperiam aut ratione autem dolorem.
-Fuga reprehenderit tempora ut ipsam cumque officiis dolorum. Sapiente omnis rerum sint quibusdam et delectus ratione. Molestiae praesentium rerum debitis deleniti voluptates enim.
-Nihil aperiam velit provident accusamus suscipit voluptates. Aut sequi id debitis tempore. Qui atque quas sed illum officia maiores incidunt.
-Similique maxime aliquam corrupti aut provident eaque. Laudantium placeat cupiditate pariatur dolore perspiciatis expedita impedit nobis. Quaerat non temporibus tempora provident eligendi.
+Work in progress...
+
 
 ### Second tab
+Work in progress...
 
-Cum eaque dicta architecto culpa eius. Dignissimos officiis error exercitationem. Adipisci odit ad ea iusto fugiat laborum maiores. Dolore sunt et veritatis alias nesciunt maxime cumque. Culpa aut non ea. Culpa ex quia debitis sint eveniet cum.
-Non eos ex aperiam dolor hic. Consectetur delectus placeat rerum consequuntur ducimus sed fugiat non. Aut voluptatem et et. Omnis sunt veniam omnis ullam.
-Dolorem eius perspiciatis et veniam hic reprehenderit ipsam ut. Exercitationem rem eius quo. Nemo quis in voluptatibus ex.
-Aut nihil quo iure quia. Error quam quidem inventore. Aut est est aut atque ipsum aut repellat. Eligendi delectus aut et quia voluptas dolores. Perspiciatis et reiciendis deleniti harum nihil officiis aperiam.
-Laborum necessitatibus beatae modi aut illo. Quaerat esse eum ipsa quisquam totam. Vitae nesciunt excepturi voluptate iusto molestiae qui animi corrupti. Voluptates et illum quia.
+
+# Modeling
+Work in progress...
+
+#Validation
+Work in progress...
+
+#Results
+Work in progress...
