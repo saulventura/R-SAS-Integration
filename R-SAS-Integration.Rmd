@@ -20,7 +20,7 @@ output:
     df_print: kable
 ---
 
-<center><img src="../images/sasandr.jpg" width="60%" height="60%" ></center>
+<center><img src="/images/sasandr.jpg" width="60%" height="60%" ></center>
 
 
 ```{r knitr_init, echo=FALSE, results="asis", cache=FALSE, warning = FALSE, message=FALSE}
@@ -41,7 +41,7 @@ opts_knit$set(width = 75)
 
 # Introduction
 
-<center><img src="../images/sasandr.jpg" width="60%" height="60%" ></center>
+<center><img src="/images/sasandr.jpg" width="60%" height="60%" ></center>
 
 ```{r sh, echo=TRUE, eval=TRUE}
 not_null <- function (v) {
