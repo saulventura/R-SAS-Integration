@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+
+
+<title>Zillow’s Home Value Prediction</title>
+<!-- Material Design fonts -->
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700">
+<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+<script src="index_files/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="index_files/bootstrap-3.3.6/css/bootstrap.min.css" rel="stylesheet" />
+<script src="index_files/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+<script src="index_files/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<script src="index_files/navigation-1.1/tabsets.js"></script>
+<script src="index_files/navigation-1.1/codefolding.js"></script>
+<link href="index_files/magnific-popup-1.1.0/magnific-popup.css" rel="stylesheet" />
+<script src="index_files/magnific-popup-1.1.0/jquery.magnific-popup.min.js"></script>
+<link href="index_files/bootstrap_material-0.1/bootstrap-material-design.min.css" rel="stylesheet" />
+<link href="index_files/bootstrap_material-0.1/ripples.min.css" rel="stylesheet" />
+<script src="index_files/bootstrap_material-0.1/material.min.js"></script>
+<script src="index_files/bootstrap_material-0.1/ripples.min.js"></script>
+<link href="index_files/material-0.1/material.css" rel="stylesheet" />
+<script src="index_files/material-0.1/material.js"></script>
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; background-color: #ffffff; color: #1f1c1b; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; background-color: #ffffff; color: #a0a0a0; border-right: 1px solid #a0a0a0; }
+td.sourceCode { padding-left: 5px; }
+pre, code { color: #1f1c1b; background-color: #ffffff; }
+code > span.kw { color: #1f1c1b; font-weight: bold; } /* Keyword */
+code > span.dt { color: #0057ae; } /* DataType */
+code > span.dv { color: #b08000; } /* DecVal */
+code > span.bn { color: #b08000; } /* BaseN */
+code > span.fl { color: #b08000; } /* Float */
+code > span.cn { color: #aa5500; } /* Constant */
+code > span.ch { color: #924c9d; } /* Char */
+code > span.sc { color: #3daee9; } /* SpecialChar */
+code > span.st { color: #bf0303; } /* String */
+code > span.vs { color: #bf0303; } /* VerbatimString */
+code > span.ss { color: #ff5500; } /* SpecialString */
+code > span.im { color: #ff5500; } /* Import */
+code > span.co { color: #898887; } /* Comment */
+code > span.do { color: #607880; } /* Documentation */
+code > span.an { color: #ca60ca; } /* Annotation */
+code > span.cv { color: #0095ff; } /* CommentVar */
+code > span.ot { color: #006e28; } /* Other */
+code > span.fu { color: #644a9b; } /* Function */
+code > span.va { color: #0057ae; } /* Variable */
+code > span.cf { color: #1f1c1b; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #1f1c1b; } /* Operator */
+code > span.bu { color: #644a9b; font-weight: bold; } /* BuiltIn */
+code > span.ex { color: #0095ff; font-weight: bold; } /* Extension */
+code > span.pp { color: #006e28; } /* Preprocessor */
+code > span.at { color: #0057ae; } /* Attribute */
+code > span.re { color: #0057ae; } /* RegionMarker */
+code > span.in { color: #b08000; } /* Information */
+code > span.wa { color: #bf0303; } /* Warning */
+code > span.al { color: #bf0303; font-weight: bold; } /* Alert */
+code > span.er { color: #bf0303; text-decoration: underline; } /* Error */
+code > span. { color: #1f1c1b; } /* Normal */
+</style>
+
+
+<!-- tabsets -->
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+
+</head>
+
+<body>
+
+<div class="header-panel shadow z-2">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-3">
+        <div id="header">
+    <h1 class="title">Zillow’s Home Value Prediction</h1>
+                </div>
+    </div>
+</div>
+</div>
+</div>
+
+
+<div class="container-fluid main-container">
+    <div class="row">
+      <nav class="col-xs-3 menu">
+        <div id="toc">
+        <ul>
+        <li><a href="#introduction">Introduction</a></li>
+        <li><a href="#tables">Tables</a></li>
+        <li><a href="#figures">Figures</a></li>
+        <li><a href="#tabbed-sections">Tabbed sections</a></li>
+        </ul>
+        </div>
+      </nav>
+     <div class="pages col-xs-9">
+     <div class="row">
+       <div class="col-xs-10">
+
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<center>
+<img src="C:/Saul/Portfolio/R-SAS-Integration/sasandr.jpg" width="75%" height="75%" >
+</center>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">not_null &lt;-<span class="st"> </span><span class="cf">function</span> (v) {
+  <span class="cf">if</span> (<span class="op">!</span><span class="kw">is.null</span>(v)) <span class="kw">return</span>(<span class="kw">paste</span>(v, <span class="st">&quot;not null&quot;</span>))
+}</code></pre></div>
+</div>
+<div id="tables" class="section level1">
+<h1>Tables</h1>
+<p>Here is a sample table output.</p>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">(4.3,5.5]</th>
+<th align="right">(5.5,6.7]</th>
+<th align="right">(6.7,7.9]</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>(2,2.6]</td>
+<td align="right">11</td>
+<td align="right">12</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td>(2.6,3.2]</td>
+<td align="right">18</td>
+<td align="right">49</td>
+<td align="right">16</td>
+</tr>
+<tr class="odd">
+<td>(3.2,3.8]</td>
+<td align="right">26</td>
+<td align="right">8</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td>(3.8,4.4]</td>
+<td align="right">4</td>
+<td align="right">2</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<p>Here we display a crosstab displayed in several different ways with a “pills” interface. To do this, just pass your <code>table()</code> result to the <code>pilltabs()</code> function.</p>
+<ul class="nav nav-pills nav-pilltabs">
+<li class="active">
+<a href="#dyntab-count71609901031" data-toggle="pill">Count</a>
+</li>
+<li>
+<a href="#dyntab-rows71609901031" data-toggle="pill">Rows %</a>
+</li>
+<li>
+<a href="#dyntab-columns71609901031" data-toggle="pill">Columns %</a>
+</li>
+<li>
+<a href="#dyntab-residuals71609901031" data-toggle="pill">Residuals</a>
+</li>
+</ul>
+<div class="tab-content">
+<div id="dyntab-count71609901031" class="tab-pane dyntab active">
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">(4.3,5.5]</th>
+<th align="right">(5.5,6.7]</th>
+<th align="right">(6.7,7.9]</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>setosa</td>
+<td align="right">47</td>
+<td align="right">3</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td>versicolor</td>
+<td align="right">11</td>
+<td align="right">36</td>
+<td align="right">3</td>
+</tr>
+<tr class="odd">
+<td>virginica</td>
+<td align="right">1</td>
+<td align="right">32</td>
+<td align="right">17</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="dyntab-rows71609901031" class="tab-pane dyntab">
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">(4.3,5.5]</th>
+<th align="right">(5.5,6.7]</th>
+<th align="right">(6.7,7.9]</th>
+<th align="right">Total</th>
+<th align="right">n</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>setosa</td>
+<td align="right">94.0</td>
+<td align="right">6.0</td>
+<td align="right">0.0</td>
+<td align="right">100</td>
+<td align="right">50</td>
+</tr>
+<tr class="even">
+<td>versicolor</td>
+<td align="right">22.0</td>
+<td align="right">72.0</td>
+<td align="right">6.0</td>
+<td align="right">100</td>
+<td align="right">50</td>
+</tr>
+<tr class="odd">
+<td>virginica</td>
+<td align="right">2.0</td>
+<td align="right">64.0</td>
+<td align="right">34.0</td>
+<td align="right">100</td>
+<td align="right">50</td>
+</tr>
+<tr class="even">
+<td>All</td>
+<td align="right">39.3</td>
+<td align="right">47.3</td>
+<td align="right">13.3</td>
+<td align="right">100</td>
+<td align="right">150</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="dyntab-columns71609901031" class="tab-pane dyntab">
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">(4.3,5.5]</th>
+<th align="right">(5.5,6.7]</th>
+<th align="right">(6.7,7.9]</th>
+<th align="right">All</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>setosa</td>
+<td align="right">79.7</td>
+<td align="right">4.2</td>
+<td align="right">0</td>
+<td align="right">33.3</td>
+</tr>
+<tr class="even">
+<td>versicolor</td>
+<td align="right">18.6</td>
+<td align="right">50.7</td>
+<td align="right">15</td>
+<td align="right">33.3</td>
+</tr>
+<tr class="odd">
+<td>virginica</td>
+<td align="right">1.7</td>
+<td align="right">45.1</td>
+<td align="right">85</td>
+<td align="right">33.3</td>
+</tr>
+<tr class="even">
+<td>Total</td>
+<td align="right">100.0</td>
+<td align="right">100.0</td>
+<td align="right">100</td>
+<td align="right">100.0</td>
+</tr>
+<tr class="odd">
+<td>n</td>
+<td align="right">59.0</td>
+<td align="right">71.0</td>
+<td align="right">20</td>
+<td align="right">150.0</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="dyntab-residuals71609901031" class="tab-pane dyntab-residuals">
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th align="right">(4.3,5.5]</th>
+<th align="right">(5.5,6.7]</th>
+<th align="right">(6.7,7.9]</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>setosa</td>
+<td align="right">6.16</td>
+<td align="right">-4.25</td>
+<td align="right">-2.58</td>
+</tr>
+<tr class="even">
+<td>versicolor</td>
+<td align="right">-1.95</td>
+<td align="right">2.54</td>
+<td align="right">-1.42</td>
+</tr>
+<tr class="odd">
+<td>virginica</td>
+<td align="right">-4.21</td>
+<td align="right">1.71</td>
+<td align="right">4.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p class="chisq-results">
+X-squared = 111.6339, df = 4, p = &lt; 2.2e-16
+</p>
+<div class="kable-table">
+<table>
+<thead>
+<tr class="header">
+<th align="right">Sepal.Length</th>
+<th align="right">Sepal.Width</th>
+<th align="right">Petal.Length</th>
+<th align="right">Petal.Width</th>
+<th align="left">Species</th>
+<th align="left">seplc</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">5.1</td>
+<td align="right">3.5</td>
+<td align="right">1.4</td>
+<td align="right">0.2</td>
+<td align="left">setosa</td>
+<td align="left">(4.3,5.5]</td>
+</tr>
+<tr class="even">
+<td align="right">4.9</td>
+<td align="right">3.0</td>
+<td align="right">1.4</td>
+<td align="right">0.2</td>
+<td align="left">setosa</td>
+<td align="left">(4.3,5.5]</td>
+</tr>
+<tr class="odd">
+<td align="right">4.7</td>
+<td align="right">3.2</td>
+<td align="right">1.3</td>
+<td align="right">0.2</td>
+<td align="left">setosa</td>
+<td align="left">(4.3,5.5]</td>
+</tr>
+<tr class="even">
+<td align="right">4.6</td>
+<td align="right">3.1</td>
+<td align="right">1.5</td>
+<td align="right">0.2</td>
+<td align="left">setosa</td>
+<td align="left">(4.3,5.5]</td>
+</tr>
+<tr class="odd">
+<td align="right">5.0</td>
+<td align="right">3.6</td>
+<td align="right">1.4</td>
+<td align="right">0.2</td>
+<td align="left">setosa</td>
+<td align="left">(4.3,5.5]</td>
+</tr>
+<tr class="even">
+<td align="right">5.4</td>
+<td align="right">3.9</td>
+<td align="right">1.7</td>
+<td align="right">0.4</td>
+<td align="left">setosa</td>
+<td align="left">(4.3,5.5]</td>
+</tr>
+</tbody>
+</table>
+</div>
+<table>
+<thead>
+<tr class="header">
+<th align="right">Sepal.Length</th>
+<th align="right">Sepal.Width</th>
+<th align="right">Petal.Length</th>
+<th align="right">Petal.Width</th>
+<th align="left">Species</th>
+<th align="left">seplc</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">5.1</td>
+<td align="right">3.5</td>
+<td align="right">1.4</td>
+<td align="right">0.2</td>
+<td align="left">setosa</td>
+<td align="left">(4.3,5.5]</td>
+</tr>
+<tr class="even">
+<td align="right">4.9</td>
+<td align="right">3.0</td>
+<td align="right">1.4</td>
+<td align="right">0.2</td>
+<td align="left">setosa</td>
+<td align="left">(4.3,5.5]</td>
+</tr>
+<tr class="odd">
+<td align="right">4.7</td>
+<td align="right">3.2</td>
+<td align="right">1.3</td>
+<td align="right">0.2</td>
+<td align="left">setosa</td>
+<td align="left">(4.3,5.5]</td>
+</tr>
+<tr class="even">
+<td align="right">4.6</td>
+<td align="right">3.1</td>
+<td align="right">1.5</td>
+<td align="right">0.2</td>
+<td align="left">setosa</td>
+<td align="left">(4.3,5.5]</td>
+</tr>
+<tr class="odd">
+<td align="right">5.0</td>
+<td align="right">3.6</td>
+<td align="right">1.4</td>
+<td align="right">0.2</td>
+<td align="left">setosa</td>
+<td align="left">(4.3,5.5]</td>
+</tr>
+<tr class="even">
+<td align="right">5.4</td>
+<td align="right">3.9</td>
+<td align="right">1.7</td>
+<td align="right">0.4</td>
+<td align="left">setosa</td>
+<td align="left">(4.3,5.5]</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="figures" class="section level1">
+<h1>Figures</h1>
+<div id="base-graphics" class="section level2">
+<h2>Base graphics</h2>
+<p>A base graphics histogram :</p>
+<p><img src="index_files/figure-html/unnamed-chunk-2-1.png" width="384" /></p>
+</div>
+<div id="ggplot2" class="section level2">
+<h2>ggplot2</h2>
+<p>Same with <code>ggplot2</code> :</p>
+<div class="figure">
+<img src="index_files/figure-html/unnamed-chunk-3-1.png" alt="Beautiful ggplot2 histogram, really" width="384" />
+<p class="caption">
+Beautiful ggplot2 histogram, really
+</p>
+</div>
+</div>
+</div>
+<div id="tabbed-sections" class="section level1">
+<h1>Tabbed sections</h1>
+<p>Here we test if tabbed sections work correctly.</p>
+<div id="classical-tabs" class="section level2 tabset">
+<h2>Classical tabs</h2>
+<p>classical tabs without fading effect.</p>
+<div id="first-tab" class="section level3">
+<h3>First tab</h3>
+<p>Quisquam sunt fugit sed aut quis et rerum mollitia. Qui consectetur eius autem ut assumenda alias. Repudiandae aut deleniti quod saepe nihil ratione alias laborum. Quibusdam aspernatur autem omnis voluptatum. Delectus illo non aut. Perferendis sunt facilis sed quam velit. Veniam voluptates ut adipisci vel debitis deserunt rerum exercitationem. Accusamus quod eius occaecati voluptatem. Ut et qui veritatis. Nulla non eum id consectetur autem pariatur. Labore aperiam officiis molestiae sed ut perferendis ea. Aperiam aut ratione autem dolorem. Fuga reprehenderit tempora ut ipsam cumque officiis dolorum. Sapiente omnis rerum sint quibusdam et delectus ratione. Molestiae praesentium rerum debitis deleniti voluptates enim. Nihil aperiam velit provident accusamus suscipit voluptates. Aut sequi id debitis tempore. Qui atque quas sed illum officia maiores incidunt. Similique maxime aliquam corrupti aut provident eaque. Laudantium placeat cupiditate pariatur dolore perspiciatis expedita impedit nobis. Quaerat non temporibus tempora provident eligendi.</p>
+</div>
+<div id="second-tab" class="section level3">
+<h3>Second tab</h3>
+<p>Cum eaque dicta architecto culpa eius. Dignissimos officiis error exercitationem. Adipisci odit ad ea iusto fugiat laborum maiores. Dolore sunt et veritatis alias nesciunt maxime cumque. Culpa aut non ea. Culpa ex quia debitis sint eveniet cum. Non eos ex aperiam dolor hic. Consectetur delectus placeat rerum consequuntur ducimus sed fugiat non. Aut voluptatem et et. Omnis sunt veniam omnis ullam. Dolorem eius perspiciatis et veniam hic reprehenderit ipsam ut. Exercitationem rem eius quo. Nemo quis in voluptatibus ex. Aut nihil quo iure quia. Error quam quidem inventore. Aut est est aut atque ipsum aut repellat. Eligendi delectus aut et quia voluptas dolores. Perspiciatis et reiciendis deleniti harum nihil officiis aperiam. Laborum necessitatibus beatae modi aut illo. Quaerat esse eum ipsa quisquam totam. Vitae nesciunt excepturi voluptate iusto molestiae qui animi corrupti. Voluptates et illum quia.</p>
+</div>
+</div>
+<div id="pill-tabs" class="section level2 tabset tabset-fade tabset-pills">
+<h2>Pill tabs</h2>
+<p>Pill tabs with fading effect.</p>
+<div id="first-tab-1" class="section level3">
+<h3>First tab</h3>
+<p>Quisquam sunt fugit sed aut quis et rerum mollitia. Qui consectetur eius autem ut assumenda alias. Repudiandae aut deleniti quod saepe nihil ratione alias laborum. Quibusdam aspernatur autem omnis voluptatum. Delectus illo non aut. Perferendis sunt facilis sed quam velit. Veniam voluptates ut adipisci vel debitis deserunt rerum exercitationem. Accusamus quod eius occaecati voluptatem. Ut et qui veritatis. Nulla non eum id consectetur autem pariatur. Labore aperiam officiis molestiae sed ut perferendis ea. Aperiam aut ratione autem dolorem. Fuga reprehenderit tempora ut ipsam cumque officiis dolorum. Sapiente omnis rerum sint quibusdam et delectus ratione. Molestiae praesentium rerum debitis deleniti voluptates enim. Nihil aperiam velit provident accusamus suscipit voluptates. Aut sequi id debitis tempore. Qui atque quas sed illum officia maiores incidunt. Similique maxime aliquam corrupti aut provident eaque. Laudantium placeat cupiditate pariatur dolore perspiciatis expedita impedit nobis. Quaerat non temporibus tempora provident eligendi.</p>
+</div>
+<div id="second-tab-1" class="section level3">
+<h3>Second tab</h3>
+<p>Cum eaque dicta architecto culpa eius. Dignissimos officiis error exercitationem. Adipisci odit ad ea iusto fugiat laborum maiores. Dolore sunt et veritatis alias nesciunt maxime cumque. Culpa aut non ea. Culpa ex quia debitis sint eveniet cum. Non eos ex aperiam dolor hic. Consectetur delectus placeat rerum consequuntur ducimus sed fugiat non. Aut voluptatem et et. Omnis sunt veniam omnis ullam. Dolorem eius perspiciatis et veniam hic reprehenderit ipsam ut. Exercitationem rem eius quo. Nemo quis in voluptatibus ex. Aut nihil quo iure quia. Error quam quidem inventore. Aut est est aut atque ipsum aut repellat. Eligendi delectus aut et quia voluptas dolores. Perspiciatis et reiciendis deleniti harum nihil officiis aperiam. Laborum necessitatibus beatae modi aut illo. Quaerat esse eum ipsa quisquam totam. Vitae nesciunt excepturi voluptate iusto molestiae qui animi corrupti. Voluptates et illum quia.</p>
+</div>
+</div>
+</div>
+
+    </div>
+    <div class="col-xs-2">
+        <div class="btn-toolbar">
+    <div class="btn-group">
+    <a href="#" class="btn btn-raised btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="text-muted">Code</span> <span class="text-muted caret"></span></a>
+    <ul class="dropdown-menu" style="min-width: 50px;">
+    <li><a id="rmd-show-all-code" href="#">Show All</a></li>
+    <li><a id="rmd-hide-all-code" href="#">Hide All</a></li>
+    </ul>
+    </div>
+    </div>
+        </div>
+  </div>
+  </div>
+  </div>
+  <div class="row">
+    </div>
+  </div>
+
+<script>
+$(document).ready(function () {
+  // add bootstrap table styles to pandoc tables
+  $('tr.header').parent('thead').parent('table').addClass('table table-striped table-hover');
+
+    var images = $('.pages img');
+  images.filter(function() {
+      if ($(this).parent().attr("class") == "figure") {
+          return(false)
+      } else {
+          return(true);
+      }
+  }).wrap("<div class='figure'></div>");
+  images.addClass("image-thumb").wrap("<div class='panel-body'></div>");
+  $('.figure p.caption').wrap("<div class='panel-footer'></div>");
+  $('.figure').addClass('panel panel-default');
+  
+    $('.pages img')
+ 	  .addClass("image-lb");
+  $('.pages').magnificPopup({
+	      type:'image',
+	      closeOnContentClick: false,
+	      closeBtnInside: false,
+        delegate: 'img',
+	      gallery: {enabled: true },
+          removalDelay: 500,
+          callbacks: {
+              beforeOpen: function() {
+                // just a hack that adds mfp-anim class to markup
+                this.st.image.markup = this.st.image.markup.replace('mfp-figure', 'mfp-figure mfp-with-anim');
+              }
+          },
+          mainClass: 'mfp-move-from-top',
+	      image: {
+	        verticalFit: true,
+            titleSrc: 'alt'
+	      }
+ 	    });
+ 	
+    
+    $('#toc ul li').first().addClass("active");
+    $('#toc ul li').attr("data-target", function() {
+        return($(this).children("a").attr("href"));
+    })
+    $('body .section.level1').first().addClass("active");
+    
+    $('#toc a[href*="#"]').click(function() {
+
+      var id = $(this).attr("href");
+      if (id === "#") return;
+      if (id.substring(0, 8) === "#dyntab-") return;
+      toggle_page(id);
+
+      // Menu
+      var menu_entry = $(".menu li[data-target='"+id+"']");
+      menu_entry.addClass("active");
+      $(".menu li").not(menu_entry).removeClass("active"); 
+      
+
+    });
+
+    function toggle_page(id) {
+      $(".page").not(page).removeClass("active").hide();
+      window.page = id;
+      var page = $(window.page);
+      window.location.hash = window.page;
+      //$(this).addClass("active");
+
+      page.show();
+
+      var totop = setInterval(function () {
+        $(".pages").animate({scrollTop: 0}, 0);
+      }, 10);
+
+      setTimeout(function () {
+        page.addClass("active");
+        setTimeout(function () {
+          clearInterval(totop);
+        }, 1000);
+      }, 100);
+
+      window.dispatchEvent(new Event('resize'));
+
+    }
+
+
+    $(".menu li").click(function () {
+
+      toggle_page($(this).data("target"));
+
+      // Menu
+      if (!$(this).data("target")) return;
+      if ($(this).is(".active")) return;
+      $(".menu li").not($(this)).removeClass("active");
+      $(this).addClass("active");
+
+    });
+  
+    
+
+
+    window.page = window.location.hash;
+    if (window.page != "") {
+      $(".menu").find("li[data-target=" + window.page + "]").trigger("click");
+    }
+
+    /* init material bootstrap js */
+    $.material.init();
+});
+</script>
+
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
