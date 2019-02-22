@@ -42,14 +42,36 @@ opts_knit$set(width = 75)
 
 # Introduction
 
-```{r figure2, echo=FALSE, fig.cap="", out.width = '80%' , out.height= '80%',fig.align ='center' }
+**Zillow** is an online real estate database company that was founded in 2006. Basically, its business model is to generate revenue by selling advertising on its web site. As does its competitors Trulia or Realtor, Zillow offers a **home value estimation** that home buyers and sellers can find useful. This service is considered a great tool but is not perfect, thus, Zillow launched a **competition on Kaggle**. 
+
+```{r figure1, echo=FALSE, fig.cap="", out.width = '80%' , out.height= '80%',fig.align ='center' }
+knitr::include_graphics("logo.jpg")
+```
+
+## Business Goal
+
+The main objective of this project is to propose an algorithm to predict a log-error between the price estimated by Zillow and the real home price based on sales.
+The formula established by Zillow is 
+
+ $$   Log.error = log (Zillow.estimation) - log (Home.price) $$
+
+##Predictive Model Cycle
+
+For all stages of the model development, I will use R and SAS Enterprise Miner. The initial stages are to get a better understanding of the data as well as to prepare it for the modeling process. These initial stages are data collection, data exploration, and data preparation. 
+
+```{r figure2, echo=FALSE, fig.cap="", out.width = '80%' , out.height= '80%',fig.align ="center" }
+knitr::include_graphics("process.jpg")
+```
+
+##Technologies
+
+During the completion of this project, we will use **R** to convey higher quality data to **SAS Enterprise Miner** that can handle more than one machine learning algorithm, also SAS will allow us to use **The model comparison node** in order to compare the performance of some models....and we can do the setup **visually**.
+So, instead of use just one tool, we will take advantage of the best of both worlds.
+```{r figure3, echo=FALSE, fig.cap="", out.width = '100%' , out.height= '80%',fig.align ="center" }
 knitr::include_graphics("sasandr.jpg")
 ```
 
-# Tables
-
-Here is a sample table output.
-
+#Data Collection
 ```{r iris_table}
 x <- cut(iris$Sepal.Width, 4)
 y <- cut(iris$Sepal.Length, 3)
