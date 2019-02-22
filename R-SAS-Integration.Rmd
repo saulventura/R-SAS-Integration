@@ -21,7 +21,11 @@ output:
     df_print: kable
     
 ---
-
+```{r opts, echo = FALSE}
+knitr::opts_chunk$set(
+  fig.path = "images/"
+)
+```
 
 ```{r pressure, echo=FALSE, fig.cap="", out.width = '60%'}
 knitr::include_graphics("sasandr.jpg")
@@ -30,8 +34,6 @@ knitr::include_graphics("sasandr.jpg")
 ```{r knitr_init, echo=FALSE, results="asis", cache=FALSE, warning = FALSE, message=FALSE}
 library(knitr)
 library(rmdformats)
-
-knitr::opts_chunk$set(fig.path = "images/")
 
 
 getwd()
