@@ -25,7 +25,16 @@ output:
 ```{r knitr_init, echo=FALSE, results="asis", cache=FALSE, warning = FALSE, message=FALSE}
 library(knitr)
 library(rmdformats)
-
+library(data.table)
+library(dplyr)
+library(ggplot2)
+library(stringr)
+library(DT)
+library(tidyr)
+library(corrplot)
+library(leaflet)
+library(lubridate)
+library(maps)
 
 ## Global options
 options(max.print = "75")
@@ -72,59 +81,206 @@ knitr::include_graphics("sasandr.jpg")
 ```
 
 #Data Collection
-```{r iris_table}
-x <- cut(iris$Sepal.Width, 4)
-y <- cut(iris$Sepal.Length, 3)
-tab <- table(x, y)
-kable(tab)
+
+
+The datasets provided by Zillow has been made public through the Kaggle website and even though the competition is closed for new participants, the data is still available. The datasets contain housing data from 2016 for three different counties in California: Los Angeles County, Ventura County and the Orange County.
+
+```{r figure4, echo=FALSE, fig.cap="", out.width = '80%' , out.height= '80%',fig.align ="center" }
+knitr::include_graphics("data.jpg")
 ```
 
-Here we display a crosstab displayed in several different ways with a "pills"
-interface. To do this, just pass your `table()` result to the `pilltabs()`
-function.
+```{r Collection, echo=TRUE,eval=TRUE , warning = FALSE, message=FALSE}
 
-```{r iris_pilltabs, results="asis"}
-iris$seplc <- cut(iris$Sepal.Length,3)
-tab <- table(iris$Species, iris$seplc)
-pilltabs(tab)
+properties <- read.csv('C:/Saul/Portfolio/data/properties_2016.csv')
+transactions <- read.csv('C:/Saul/Portfolio/data/train_2016_v2.csv')
+sample_submission <- read.csv('C:/Saul/Portfolio/data/sample_submission.csv')
+
+
+names(properties)
+names(transactions)
+names(sample_submission)
+
+datatable(properties[(1:20),], filter = 'top', options = list(
+  pageLength = 5, scrollX = TRUE, scrollY = "200px", autoWidth = TRUE), caption = 'Table 1: Properties.')
+
+
+
 ```
 
 
+```{r Collection1, echo=TRUE,eval=TRUE , warning = FALSE, message=FALSE}
 
-```{r}
-head(iris)
+
+
 ```
 
-```{r my_table1, echo=FALSE}
-library(xtable)
-kable(xtable(head(iris)))
-```
+
 
 # Data Exploration
 
-## Base graphics
+## Histogram graphics
 
-A base graphics histogram :
+Reviewing some of the data, the **build year** feature has almost a standard distribution, also an important proportion of the houses were built several years ago. Regarding the rest of features such as the number of bedrooms, number of bathrooms, number and capacity of garages, tax delinquency, property taxes, etc. Most of them have normalized data as well. Furthermore, the distribution for the critical attribute called log-error, as this is the variable to predict, has a normalized data.
 
 ```{r}
-hist(rnorm(100))
-```
 
-## Missing Values
+df <- data.frame(properties)
+ggplot(df, aes(x = yearbuilt)) +
+  geom_histogram(bins = 20, fill="#08519C", alpha=1) +
+  geom_vline(aes(xintercept=mean(yearbuilt)), ## straight line for the mean
+             colour = "#ADFF2F", size=1.5, alpha=0.5) + 
+  geom_vline(aes(xintercept=median(yearbuilt)), ## dashed line for the median
+             colour = "#ADFF2F", linetype="dashed", size=1.5, alpha=0.5) +
+  labs(x = "Years", y = "Frequency") +
+  ggtitle("Histogram Home Aging") 
 
-Same with `ggplot2` :
 
-```{r, fig.cap="Beautiful ggplot2 histogram, really"}
-library(ggplot2)
-d <- data.frame(x=rnorm(100))
-ggplot(data=d) + geom_histogram(aes(x=x), bins = 30)
+
+# Rename the variable names
+# FunctionX(dataA) is the same as dataA %>% functionX
+
+properties <- properties %>% rename(
+  id_parcel = parcelid,
+  build_year = yearbuilt,
+  area_basement = basementsqft,
+  area_patio = yardbuildingsqft17,
+  area_shed = yardbuildingsqft26, 
+  area_pool = poolsizesum,  
+  area_lot = lotsizesquarefeet, 
+  area_garage = garagetotalsqft,
+  area_firstfloor_finished = finishedfloor1squarefeet,
+  area_total_calc = calculatedfinishedsquarefeet,
+  area_base = finishedsquarefeet6,
+  area_live_finished = finishedsquarefeet12,
+  area_liveperi_finished = finishedsquarefeet13,
+  area_total_finished = finishedsquarefeet15,  
+  area_unknown = finishedsquarefeet50,
+  num_unit = unitcnt, 
+  num_story = numberofstories,  
+  num_room = roomcnt,
+  num_bathroom = bathroomcnt,
+  num_bedroom = bedroomcnt,
+  num_bathroom_calc = calculatedbathnbr,
+  num_bath = fullbathcnt,  
+  num_75_bath = threequarterbathnbr, 
+  num_fireplace = fireplacecnt,
+  num_pool = poolcnt,  
+  num_garage = garagecarcnt,  
+  region_county = regionidcounty,
+  region_city = regionidcity,
+  region_zip = regionidzip,
+  region_neighbor = regionidneighborhood,  
+  tax_total = taxvaluedollarcnt,
+  tax_building = structuretaxvaluedollarcnt,
+  tax_land = landtaxvaluedollarcnt,
+  tax_property = taxamount,
+  tax_year = assessmentyear,
+  tax_delinquency = taxdelinquencyflag,
+  tax_delinquency_year = taxdelinquencyyear,
+  zoning_property = propertyzoningdesc,
+  zoning_landuse = propertylandusetypeid,
+  zoning_landuse_county = propertycountylandusecode,
+  flag_fireplace = fireplaceflag, 
+  flag_tub = hashottuborspa,
+  quality = buildingqualitytypeid,
+  framing = buildingclasstypeid,
+  material = typeconstructiontypeid,
+  deck = decktypeid,
+  story = storytypeid,
+  heating = heatingorsystemtypeid,
+  aircon = airconditioningtypeid,
+  architectural_style= architecturalstyletypeid
+)
+
+transactions <- transactions %>% rename(
+  id_parcel = parcelid,
+  date = transactiondate
+)
+
+# Convert dummary variables (Y and N) to (1 and 0)
+properties <- properties %>% 
+  mutate(tax_delinquency = ifelse(tax_delinquency=="Y",1,0),
+         flag_fireplace = ifelse(flag_fireplace=="Y",1,0),
+         flag_tub = ifelse(flag_tub=="Y",1,0))
+
+# Take a look at the data
+properties <- properties %>% select(id_parcel, build_year, starts_with("area_"), 
+                                    starts_with("num_"), starts_with("flag_"), starts_with("region_"), everything())
+datatable(head(properties,100), style="bootstrap", class="table-condensed", options = list(dom = 'tp',scrollX = TRUE))
+datatable(head(transactions,100), style="bootstrap", class="table-condensed", options = list(dom = 'tp'))
+
+# Take a look at the transaction data
+tmp <- transactions %>% mutate(year_month = make_date(year=year(date),month=month(date)))
+tmp %>% 
+  group_by(year_month) %>% count() %>% 
+  ggplot(aes(x=year_month,y=n)) +
+  geom_bar(stat="identity", fill="red")+
+  geom_vline(aes(xintercept=as.numeric(as.Date("2016-10-01"))),size=2)
+
+# Distribution of Zestaimate's forecast errors (log rror)
+# logerror: log(Zestimate) - log(Saleprice). So a positive logerror means Zestimate is overestimating the Saleprice, 
+# a negative logerror means that Zestimate is underestimating Saleprice. 
+# absolute logerror: a small value means that log(Zestimate) is close to log(Saleprice). 
+# So, Zestimate predictions are close to Saleprice.
+
+transactions %>% 
+  ggplot(aes(x=logerror)) + 
+  geom_histogram(bins=400, fill="#08519C")+
+  theme_bw()+theme(axis.title = element_text(size=16),axis.text = element_text(size=14))+
+  ylab("Frequency")+coord_cartesian(x=c(-0.5,0.5)) +
+  ggtitle("Histogram Log error") 
+
+
+
+# Absolute logerror
+transactions <- transactions %>% mutate(abs_logerror = abs(logerror))
+# it is the same as: transactions$abs_logerror=abs(transactions$logerror)
+
+transactions %>% 
+  ggplot(aes(x=abs_logerror)) + 
+  geom_histogram(bins=400, fill="orange")+
+  theme_bw()+theme(axis.title = element_text(size=16),axis.text = element_text(size=14))+
+  ylab("Count")+coord_cartesian(x=c(0,0.5))
+
+# How does log error change with time
+transactions %>% 
+  mutate(year_month = make_date(year=year(date),month=month(date)) ) %>% 
+  group_by(year_month) %>% summarize(mean_logerror = mean(logerror)) %>% 
+  ggplot(aes(x=year_month,y=mean_logerror)) + 
+  geom_line(size=1.5, color="red")+geom_point(size=5, color="red")+theme_bw()
+
+
 ```
 
 
 
 # Data Preparation
 
-Here we test if tabbed sections work correctly.
+```{r Preparation, echo=TRUE,eval=TRUE , warning = FALSE, message=FALSE}
+
+missing_values <- properties %>% summarize_all(funs(sum(is.na(.))/n()))
+
+missing_values <- gather(missing_values, key="feature", value="missing_pct")
+missing_values %>% 
+  ggplot(aes(x=reorder(feature,-missing_pct),y=missing_pct)) +
+  geom_bar(stat="identity",fill="#08519C")+
+  coord_flip()+theme_bw()+
+  labs(y = "Missingness", x = "Attributes") +
+  ggtitle("Missing data") 
+
+
+
+
+
+good_features <- filter(missing_values, missing_pct<0.25)
+good_features
+
+```
+
+
+
+
+
 
 ## Classical tabs {.tabset}
 
