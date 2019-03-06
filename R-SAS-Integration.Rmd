@@ -35,6 +35,7 @@ library(corrplot)
 library(leaflet)
 library(lubridate)
 library(maps)
+library(imputeTS)
 
 ## Global options
 options(max.print = "75")
@@ -346,28 +347,83 @@ corrplot(cor(tmp, use="complete.obs"), type="lower", col = col3(20))
 
 ```
 
+## Data Imputation
 
 
-## Classical tabs {.tabset}
+After removing some attributes in the Data cleaning stage, in this transferring step we made sure to change the format when needed to the selected attributes to guarantee that they can be conveyed and processed through SAS Enterprise Manager without issues. 
 
-classical tabs without fading effect.
+Additionally, to complete the missing values we will use an interpolation process available in the R packages. 
 
-### First tab
+After that, the final features to be used in the modeling are tax property, finished living, number of garages, number of bedrooms, number of bathrooms, build year, and tax delinquency. 
 
-Work in progress...
+```{r Imputation, echo=TRUE,eval=TRUE , fig.width=7, fig.height=7,   warning = FALSE, message=FALSE}
 
-### Second tab
+cor_tmp <- na.interpolation(cor_tmp)
 
-Work in progress...
+data.to.sas  <- subset (cor_tmp, select = c(logerror , tax_property , area_live_finished , num_garage , num_bedroom , num_bathroom , build_year , tax_delinquency))
 
 
+# 
+# 
+# ## Classical tabs {.tabset}
+# 
+# classical tabs without fading effect.
+# 
+# ### First tab
+# 
+# Work in progress...
+# 
+# ### Second tab
+# 
+# Work in progress...
+
+
+```
 
 
 # Modeling
-Work in progress...
+
+##Diagramming
+
+For this stage, the first that needed to be done is the creation of a Project in SAS Enterprise Miner, then, to create a diagram within the project. 
+Next step is to import the dataset file generated via R after the data preparation activities.
+
+
+Initially, I utilized two models for this analytics project: Linear regression that is easy to understand and explain and can be managed to avoid overfitting. Second, I chose decision trees than can handle non-linear relationships and are fairly robust to outliers.
+
+Then, in order to refine the predictive mode, let's select a third model, Gradient Boosting, which can create a series of decision trees that form a single predictive model. Gradient Boosting is less susceptible to overfitting the data than a single decision tree. 
+
+
+```{r figure6, echo=FALSE, fig.cap="", out.width = '80%' , out.height= '80%',fig.align ="center" }
+knitr::include_graphics("diagram.jpg")
+```
+
+
+
 
 #Validation
-Work in progress...
+
+For this dataset conveyed from R, we will use the Partition feature of SAS Enterprise Miner to split it towards a validation dataset and a training dataset. The performance measure will use the metric called Mean Absolute Error (MAE) as stipulated by Zillow’s competition rules.
+
+```{r figure7, echo=FALSE, fig.cap="", out.width = '80%' , out.height= '80%',fig.align ="center" }
+knitr::include_graphics("modelcomparison.jpg")
+```
 
 #Results
-Work in progress...
+
+Since SAS does not automatically calculate the mean absolute error (MAE), the metric requested by Zillow, we will calculate it via SAS Code node. The MAE is 0.067921, a pretty decent value considering that the top Kaggle Error values are around 0.064.
+
+```{r figure8, echo=FALSE, fig.cap="", out.width = '80%' , out.height= '80%',fig.align ="center" }
+knitr::include_graphics("validation.jpg")
+```
+
+#Conclusions
+
++ Data preparation is much more efficiently done by another tool that is different from SAS Enterprise Miner. In this case, we used R and a lot of time was saved. SAS does offer an integration allowing to import the file directly. 
+
++ The model comparison feature provided by SAS is really impressive. Although similar tasks can be performed by R, there are no control points, a very nice feature of SAS.
+
++ Modeling graphically provides a wider vision to think of out the box. That is an advantage of SAS Enterprise Miner.
+
++ Next steps migth be improve the model using other algorithms, for instance: neural network, as well as other techniques such as Principal Components Analysis (PCA).
+
