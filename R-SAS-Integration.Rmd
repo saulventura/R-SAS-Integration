@@ -100,6 +100,12 @@ names(properties)
 names(transactions)
 names(sample_submission)
 
+
+```
+Let's review a small sample of the data.
+```{r Collection1, echo=TRUE,eval=TRUE , warning = FALSE, message=FALSE}
+
+
 datatable(properties[(1:20),], filter = 'top', options = list(
   pageLength = 5, scrollX = TRUE, scrollY = "200px", autoWidth = TRUE), caption = 'Table 1: Properties.')
 
@@ -107,26 +113,18 @@ datatable(properties[(1:20),], filter = 'top', options = list(
 
 ```
 
-
-```{r Collection1, echo=TRUE,eval=TRUE , warning = FALSE, message=FALSE}
-
-
-
-```
-
-
-
 # Data Exploration
 
 ## Histogram graphics
 
 Reviewing some of the data, the **build year** feature has almost a standard distribution, also an important proportion of the houses were built several years ago. Regarding the rest of features such as the number of bedrooms, number of bathrooms, number and capacity of garages, tax delinquency, property taxes, etc. Most of them have normalized data as well. Furthermore, the distribution for the critical attribute called log-error, as this is the variable to predict, has a normalized data.
 
-```{r}
+```{r Exploration, echo=TRUE,eval=TRUE , warning = FALSE, message=FALSE}
+
 
 df <- data.frame(properties)
 ggplot(df, aes(x = yearbuilt)) +
-  geom_histogram(bins = 20, fill="#08519C", alpha=1) +
+  geom_histogram(bins = 20, fill="darkgreen", alpha=1) +
   geom_vline(aes(xintercept=mean(yearbuilt)), ## straight line for the mean
              colour = "#ADFF2F", size=1.5, alpha=0.5) + 
   geom_vline(aes(xintercept=median(yearbuilt)), ## dashed line for the median
@@ -206,79 +204,147 @@ properties <- properties %>%
 # Take a look at the data
 properties <- properties %>% select(id_parcel, build_year, starts_with("area_"), 
                                     starts_with("num_"), starts_with("flag_"), starts_with("region_"), everything())
-datatable(head(properties,100), style="bootstrap", class="table-condensed", options = list(dom = 'tp',scrollX = TRUE))
-datatable(head(transactions,100), style="bootstrap", class="table-condensed", options = list(dom = 'tp'))
 
-# Take a look at the transaction data
+
+#datatable(head(properties,100), style="bootstrap", class="table-condensed", options = list(dom = 'tp',scrollX = TRUE))
+#datatable(head(transactions,100), style="bootstrap", class="table-condensed", options = list(dom = 'tp'))
+
+```
+
+Let's take a look at the transaction data.
+
+```{r Exploration2, echo=TRUE,eval=TRUE , warning = FALSE, message=FALSE}
+
+
+
 tmp <- transactions %>% mutate(year_month = make_date(year=year(date),month=month(date)))
 tmp %>% 
   group_by(year_month) %>% count() %>% 
   ggplot(aes(x=year_month,y=n)) +
-  geom_bar(stat="identity", fill="red")+
+  geom_bar(stat="identity", fill="darkgreen")+
   geom_vline(aes(xintercept=as.numeric(as.Date("2016-10-01"))),size=2)
 
-# Distribution of Zestaimate's forecast errors (log rror)
-# logerror: log(Zestimate) - log(Saleprice). So a positive logerror means Zestimate is overestimating the Saleprice, 
-# a negative logerror means that Zestimate is underestimating Saleprice. 
-# absolute logerror: a small value means that log(Zestimate) is close to log(Saleprice). 
-# So, Zestimate predictions are close to Saleprice.
+```
+
+
+
+```{r Exploration3, echo=TRUE,eval=TRUE , warning = FALSE, message=FALSE}
+
+
+
+
+
+```
+
+## Log data plots {.tabset .tabset-fade .tabset-pills}
+
+
+Let's review the distribution of Zestimate's forecast errors (log error).
+
+Also, let's check how is the distribution when using an absolute logerror.
+
+Then, let's see how does log error change along the time.
+
+
+### Log Error Histogram
+
+```{r Exploration4, echo=TRUE,eval=TRUE , warning = FALSE, message=FALSE}
+
 
 transactions %>% 
   ggplot(aes(x=logerror)) + 
-  geom_histogram(bins=400, fill="#08519C")+
+  geom_histogram(bins=400, fill="darkgreen")+
   theme_bw()+theme(axis.title = element_text(size=16),axis.text = element_text(size=14))+
   ylab("Frequency")+coord_cartesian(x=c(-0.5,0.5)) +
   ggtitle("Histogram Log error") 
+
+```
+
+### Absolute Log Error Histogram
+
+```{r Exploration5, echo=TRUE,eval=TRUE , warning = FALSE, message=FALSE}
 
 
 
 # Absolute logerror
 transactions <- transactions %>% mutate(abs_logerror = abs(logerror))
-# it is the same as: transactions$abs_logerror=abs(transactions$logerror)
-
 transactions %>% 
   ggplot(aes(x=abs_logerror)) + 
-  geom_histogram(bins=400, fill="orange")+
+  geom_histogram(bins=400, fill="#0da107")+
   theme_bw()+theme(axis.title = element_text(size=16),axis.text = element_text(size=14))+
-  ylab("Count")+coord_cartesian(x=c(0,0.5))
+  ylab("Frequency")+coord_cartesian(x=c(0,0.5))
+
+```
+
+### Log Error through the time
+
+```{r Exploration6, echo=TRUE,eval=TRUE , warning = FALSE, message=FALSE}
 
 # How does log error change with time
 transactions %>% 
   mutate(year_month = make_date(year=year(date),month=month(date)) ) %>% 
   group_by(year_month) %>% summarize(mean_logerror = mean(logerror)) %>% 
   ggplot(aes(x=year_month,y=mean_logerror)) + 
-  geom_line(size=1.5, color="red")+geom_point(size=5, color="red")+theme_bw()
+  geom_line(size=1.5, color="darkgreen")+geom_point(size=5, color="lightgreen")+theme_bw()
 
 
 ```
 
 
-
 # Data Preparation
 
-```{r Preparation, echo=TRUE,eval=TRUE , warning = FALSE, message=FALSE}
+## Data Cleaning
+
+Let's plot a missingness chart to see that there are several features which have a bunch of missing values. 
+
+```{r Preparation, echo=TRUE,eval=TRUE , fig.width=7, fig.height=8, warning = FALSE, message=FALSE}
 
 missing_values <- properties %>% summarize_all(funs(sum(is.na(.))/n()))
 
 missing_values <- gather(missing_values, key="feature", value="missing_pct")
 missing_values %>% 
   ggplot(aes(x=reorder(feature,-missing_pct),y=missing_pct)) +
-  geom_bar(stat="identity",fill="#08519C")+
+  geom_bar(stat="identity",fill="#0da107")+
   coord_flip()+theme_bw()+
-  labs(y = "Missingness", x = "Attributes") +
+  labs(y = "Missingness", x = "Features") +
   ggtitle("Missing data") 
 
+```
+Based on data provided by the above chart, We will retrieve only the features whose missing data is not more than 25%. There are 39 attributes, as shown in below table.
 
-
-
+```{r Preparation1, echo=TRUE,eval=TRUE , fig.width=7, fig.height=8, warning = FALSE, message=FALSE}
 
 good_features <- filter(missing_values, missing_pct<0.25)
 good_features
 
 ```
+## Correlation Analysis
+
+Next step is to review the correlation among the features. After using sets of attributes we can note that some of them are highly correlated, such as the number of calculated bathrooms and the actual number of bathrooms, similarly, there is a correlation for the total tax and the property tax. Correlated features had to be removed.
+
+Let's see correlation among room features.
+
+```{r Preparation2, echo=TRUE,eval=TRUE , fig.width=7, fig.height=7, warning = FALSE, message=FALSE}
 
 
+col3 <- colorRampPalette(c("blue", "white", "#4bb048")) 
 
+  vars <- good_features$feature[str_detect(good_features$feature,'num_')]
+cor_tmp <- transactions %>% left_join(properties, by="id_parcel") 
+tmp <- cor_tmp %>% select(one_of(c(vars,"logerror")))
+corrplot(cor(tmp, use="complete.obs"),type="lower", col = col3(20))
+
+
+```
+
+Let's see correlation among tax amount features.
+```{r Preparation3, echo=TRUE,eval=TRUE , fig.width=7, fig.height=7,   warning = FALSE, message=FALSE}
+
+vars <- setdiff(good_features$feature[str_detect(good_features$feature,'tax_')],c("tax_delinquency","tax_year"))
+tmp <- cor_tmp %>%  select(one_of(c(vars,"logerror")))
+corrplot(cor(tmp, use="complete.obs"), type="lower", col = col3(20))
+
+```
 
 
 
@@ -295,17 +361,6 @@ Work in progress...
 Work in progress...
 
 
-## Pill tabs {.tabset .tabset-fade .tabset-pills}
-
-Pill tabs with fading effect.
-
-### First tab
-
-Work in progress...
-
-
-### Second tab
-Work in progress...
 
 
 # Modeling
